@@ -13,7 +13,7 @@ There are a lot of "bonuses" included in the specifications in this project. We 
 ## Getting Started
 
 - Create **one** fork of this repository for your entire group, titled project3-f26-[groupname]
-- Set the owner of the repository to BoG-Dev-Bootcamp-F26
+- Set the owner of the repository to BoG-Developer-Bootcamp-Fall-26
 - Each group member should clone the repository locally, and run `npm install` in the project folder
 - A Next.js project has been provided here, please organize the project similar to the structure introduced in [Lecture 13](https://docs.google.com/presentation/d/1I-55ARz-_meRTOC1p7JvE-53YfZk1bluluav6spEIzo/edit#slide=id.g2986939648e_2_111)
 - Create a `.env` file in the root for all your environment variables
