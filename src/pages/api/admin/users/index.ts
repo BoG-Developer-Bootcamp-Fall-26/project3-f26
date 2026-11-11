@@ -1,6 +1,5 @@
 import connectDB from "@server/mongodb";
 import User from "@server/mongodb/models/User"
-import * as argon2 from "argon2";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
