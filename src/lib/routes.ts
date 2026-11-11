@@ -2,9 +2,9 @@ export const routes = {
   login: "/login",
   createAccount: "/create-account",
 
-  trainingLogs: "/training-logs/dashboard",
-  newTrainingLog: "/training-logs/new",
-  editTrainingLog: (logId: string) => `/training-logs/${logId}/edit`,
+  trainingLogs: "/training",
+  newTrainingLog: "/training/new",
+  editTrainingLog: (logId: string) => `/training/${logId}/edit`,
 
   animals: "/animals",
 
