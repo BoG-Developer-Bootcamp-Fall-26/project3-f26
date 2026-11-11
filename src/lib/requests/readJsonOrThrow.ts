@@ -13,11 +13,8 @@ async function readBackendErrorMessage(response: Response): Promise<string | nul
     if (typeof body.message === "string") {
       return body.message;
     }
-    if (typeof body.error === "string") {
-      return body.error;
-    }
+    return null;
   } catch {
     return null;
   }
-  return null;
 }

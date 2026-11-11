@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Sidebar from "@/components/layout/Sidebar";
+import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/layout/TopBar";
 
 interface SharedLayoutProps {

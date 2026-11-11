@@ -1,6 +1,9 @@
 
 import { useState } from "react";
+import { useRouter } from "next/router";
+import SharedLayout from "@/components/layout/SharedLayout";
 import TrainingLogCard from "@/components/TrainingLogCard";
+import { routes } from "@/lib/routes";
 
 interface TrainingLog {
     _id: string;
@@ -52,6 +55,7 @@ const sampleTrainingLogs: TrainingLog[] = [
 ];
 
 export default function TrainingDashboard() {
+    const router = useRouter();
     const [search, setSearch] = useState("");
 
     const filteredLogs = sampleTrainingLogs.filter((log) =>
@@ -61,31 +65,19 @@ export default function TrainingDashboard() {
     );
 
     return (
-        <main className="min-h-screen bg-white">
-            <div className="flex h-[50px] items-center justify-between border-b border-gray-200 px-7">
-                <h1 className="text-[16px] font-semibold text-[#817775]">
-                    Training logs
-                </h1>
-
+        <SharedLayout
+            pageTitle="Training logs"
+            headerAction={
                 <a
                     href="/training/new"
                     className="text-[13px] font-semibold text-[#817775] hover:text-red-600"
                 >
                     ⊞ Create new
                 </a>
-            </div>
-
-            <div className="px-7 py-6">
-                <div className="mb-6">
-                    <input
-                        type="text"
-                        placeholder="Search training logs..."
-                        value={search}
-                        onChange={(event) => setSearch(event.target.value)}
-                        className="w-full max-w-[400px] rounded-lg border border-gray-300 px-4 py-2 text-sm text-black outline-none focus:border-red-500"
-                    />
-                </div>
-
+            }
+            onSearchChange={setSearch}
+        >
+            <div>
                 {filteredLogs.length > 0 ? (
                     <div className="mx-auto flex max-w-[650px] flex-col gap-[17px]">
                         {filteredLogs.map((log) => (
@@ -96,7 +88,7 @@ export default function TrainingDashboard() {
                                 animalName="Lucy"
                                 animalBreed="Golden Retriever"
                                 onEdit={() => {
-                                    console.log("Edit training log:", log._id);
+                                    router.push(routes.editTrainingLog(log._id));
                                 }}
                             />
                         ))}
@@ -107,6 +99,6 @@ export default function TrainingDashboard() {
                     </p>
                 )}
             </div>
-        </main>
+        </SharedLayout>
     );
 }

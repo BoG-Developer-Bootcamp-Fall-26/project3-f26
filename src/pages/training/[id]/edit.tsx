@@ -3,16 +3,16 @@ import { useRouter } from "next/router";
 import SharedLayout from "@/components/layout/SharedLayout";
 import TrainingLogForm, { type TrainingLogFormValues } from "@/components/training-logs/TrainingLogForm";
 import ErrorMessage from "@/components/ui/ErrorMessage";
-import { useRequireCurrentUser } from "@/hooks/useRequireCurrentUser";
-import { fetchTrainingLogsForUser, updateTrainingLog } from "@/lib/api/trainingLogs";
+import { useRequireUserId } from "@/hooks/useRequireUserId";
+import { addAnimalHours } from "@/lib/requests/animals";
+import { fetchTrainingLogsForUser, updateTrainingLog } from "@/lib/requests/trainingLogs";
 import { getErrorMessage } from "@/lib/getErrorMessage";
 import { routes } from "@/lib/routes";
 import type { TrainingLogWithDetails } from "@/types/models";
 
 export default function EditTrainingLogPage() {
   const router = useRouter();
-  const currentUser = useRequireCurrentUser();
-  const userId = currentUser?.userId;
+  const userId = useRequireUserId();
   const logId = typeof router.query.id === "string" ? router.query.id : undefined;
 
   const [log, setLog] = useState<TrainingLogWithDetails | null>(null);
@@ -48,7 +48,7 @@ export default function EditTrainingLogPage() {
     loadLog(userId, logId);
   }, [userId, logId]);
 
-  if (!currentUser) {
+  if (!userId) {
     return null;
   }
 
@@ -63,12 +63,20 @@ export default function EditTrainingLogPage() {
     try {
       await updateTrainingLog({
         _id: log._id,
-        user: currentUser.userId,
+        user: userId,
         animal: values.animalId,
         title: values.title,
         description: values.description,
         hours: values.hours,
       });
+
+      if (values.animalId === log.animal._id) {
+        await addAnimalHours(log.animal._id, values.hours - log.hours);
+      } else {
+        await addAnimalHours(log.animal._id, -log.hours);
+        await addAnimalHours(values.animalId, values.hours);
+      }
+
       router.push(routes.trainingLogs);
     } catch (error) {
       setSaveErrorMessage(getErrorMessage(error));

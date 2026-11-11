@@ -45,22 +45,16 @@ export default function TrainingLogForm({
   return (
     <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-2xl flex-col gap-5">
       <FormField label="Title" htmlFor="title">
-        <TextInput
-          id="title"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          placeholder="Title"
-          required
-        />
+        <TextInput id="title" type="text" value={title} placeholder="Title" onChange={setTitle} />
       </FormField>
 
       <FormField label="Animal ID" htmlFor="animalId">
         <TextInput
           id="animalId"
+          type="text"
           value={animalId}
-          onChange={(event) => setAnimalId(event.target.value)}
           placeholder="Paste the animal's ID"
-          required
+          onChange={setAnimalId}
         />
       </FormField>
 
@@ -68,23 +62,16 @@ export default function TrainingLogForm({
         <TextInput
           id="hours"
           type="number"
+          value={hoursText}
+          placeholder="0"
+          onChange={setHoursText}
           min={0}
           step={0.5}
-          value={hoursText}
-          onChange={(event) => setHoursText(event.target.value)}
-          placeholder="0"
-          required
         />
       </FormField>
 
       <FormField label="Note" htmlFor="description">
-        <TextArea
-          id="description"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          placeholder="Note"
-          required
-        />
+        <TextArea id="description" value={description} placeholder="Note" onChange={setDescription} />
       </FormField>
 
       {errorMessage && <ErrorMessage message={errorMessage} />}

@@ -24,10 +24,21 @@ export interface TrainingLog {
   hours: number;
 }
 
+export interface TrainingLogUser {
+  _id: string;
+  fullName: string;
+}
+
+export interface TrainingLogAnimal {
+  _id: string;
+  name: string;
+  breed: string;
+}
+
 export interface TrainingLogWithDetails {
   _id: string;
-  user: Pick<User, "_id" | "fullName">;
-  animal: Pick<Animal, "_id" | "name" | "breed">;
+  user: TrainingLogUser;
+  animal: TrainingLogAnimal;
   title: string;
   date: string;
   description: string;

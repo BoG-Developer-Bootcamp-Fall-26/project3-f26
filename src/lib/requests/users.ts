@@ -1,4 +1,4 @@
-import { readJsonOrThrow } from "@/lib/api/readJsonOrThrow";
+import { readJsonOrThrow } from "@/lib/requests/readJsonOrThrow";
 import type { User } from "@/types/models";
 
 const ADMIN_USERS_ENDPOINT = "/api/admin/users";

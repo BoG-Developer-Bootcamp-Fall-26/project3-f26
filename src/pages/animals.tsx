@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import AnimalCard from "@/components/AnimalCard";
+import SharedLayout from "@/components/layout/SharedLayout";
 
 interface Animal {
     _id: string;
@@ -72,31 +73,19 @@ export default function AnimalsDashboard() {
     );
 
     return (
-        <main className="min-h-screen bg-white">
-            <div className="flex h-[50px] items-center justify-between border-b border-gray-200 px-7">
-                <h1 className="text-[16px] font-semibold text-[#817775]">
-                    Animals
-                </h1>
-
+        <SharedLayout
+            pageTitle="Animals"
+            headerAction={
                 <a
                     href="/animals/new"
                     className="text-[13px] font-semibold text-[#817775] hover:text-red-600"
                 >
                     ⊞ Create new
                 </a>
-            </div>
-
-            <div className="px-7 py-6">
-                <div className="mb-6">
-                    <input
-                        type="text"
-                        placeholder="Search animals..."
-                        value={search}
-                        onChange={(event) => setSearch(event.target.value)}
-                        className="w-full max-w-[400px] rounded-lg border border-gray-300 px-4 py-2 text-sm text-black outline-none focus:border-red-500"
-                    />
-                </div>
-
+            }
+            onSearchChange={setSearch}
+        >
+            <div>
                 {filteredAnimals.length > 0 ? (
                     <div className="grid grid-cols-1 justify-items-center gap-x-7 gap-y-7 md:grid-cols-2 xl:grid-cols-3">
                         {filteredAnimals.map((animal) => (
@@ -113,6 +102,6 @@ export default function AnimalsDashboard() {
                     </p>
                 )}
             </div>
-        </main>
+        </SharedLayout>
     );
 }

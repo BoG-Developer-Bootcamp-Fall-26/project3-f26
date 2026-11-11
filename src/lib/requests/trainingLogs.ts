@@ -1,4 +1,4 @@
-import { readJsonOrThrow } from "@/lib/api/readJsonOrThrow";
+import { readJsonOrThrow } from "@/lib/requests/readJsonOrThrow";
 import type { TrainingLog, TrainingLogWithDetails } from "@/types/models";
 
 const TRAINING_ENDPOINT = "/api/training";

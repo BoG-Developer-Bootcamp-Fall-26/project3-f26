@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import SharedLayout from "@/components/layout/SharedLayout";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import UserCard from "@/components/users/UserCard";
-import { useRequireCurrentUser } from "@/hooks/useRequireCurrentUser";
-import { fetchAllUsers } from "@/lib/api/users";
+import { useRequireUserId } from "@/hooks/useRequireUserId";
+import { fetchAllUsers } from "@/lib/requests/users";
 import { getErrorMessage } from "@/lib/getErrorMessage";
 import type { User } from "@/types/models";
 
 export default function AllUsersPage() {
-  const currentUser = useRequireCurrentUser();
-  const userId = currentUser?.userId;
+  const userId = useRequireUserId();
 
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +36,7 @@ export default function AllUsersPage() {
     loadUsers();
   }, [userId]);
 
-  if (!currentUser) {
+  if (!userId) {
     return null;
   }
 

@@ -1,8 +1,21 @@
-import type { TextareaHTMLAttributes } from "react";
-import { inputClasses } from "@/components/ui/TextInput";
+import { INPUT_CLASSES } from "@/components/ui/TextInput";
 
-type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;
+interface TextAreaProps {
+  id: string;
+  value: string;
+  placeholder: string;
+  onChange: (newValue: string) => void;
+}
 
-export default function TextArea(props: TextAreaProps) {
-  return <textarea className={`${inputClasses} min-h-32 resize-y`} {...props} />;
+export default function TextArea({ id, value, placeholder, onChange }: TextAreaProps) {
+  return (
+    <textarea
+      id={id}
+      value={value}
+      placeholder={placeholder}
+      onChange={(event) => onChange(event.target.value)}
+      required
+      className={`${INPUT_CLASSES} min-h-32 resize-y`}
+    />
+  );
 }

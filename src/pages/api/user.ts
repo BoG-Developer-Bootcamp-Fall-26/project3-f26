@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import argon2 from "argon2";
-import { connectDatabase } from "@/server/connectDatabase";
-import { UserModel } from "@/server/models/UserModel";
+import { getDatabase, USERS_COLLECTION } from "@/server/getDatabase";
 import { isFilledString } from "@/server/validateInput";
 
 export default async function handleUserRequest(request: NextApiRequest, response: NextApiResponse) {
@@ -27,28 +26,29 @@ async function createUser(request: NextApiRequest, response: NextApiResponse) {
   }
 
   try {
-    await connectDatabase();
+    const users = getDatabase().collection(USERS_COLLECTION);
 
     const email = body.email.trim();
-    const existingUser = await UserModel.findOne({ email: email });
+    const existingUser = await users.findOne({ email: email });
     if (existingUser) {
       response.status(400).json({ message: "An account with this email already exists." });
       return;
     }
 
+    const fullName = body.fullName.trim();
     const hashedPassword = await argon2.hash(body.password);
-    const createdUser = await UserModel.create({
-      fullName: body.fullName.trim(),
+    const result = await users.insertOne({
+      fullName: fullName,
       email: email,
       password: hashedPassword,
       admin: body.admin,
     });
 
     response.status(200).json({
-      _id: createdUser._id,
-      fullName: createdUser.fullName,
-      email: createdUser.email,
-      admin: createdUser.admin,
+      _id: result.insertedId,
+      fullName: fullName,
+      email: email,
+      admin: body.admin,
     });
   } catch (error) {
     console.error(error);

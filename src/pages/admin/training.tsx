@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import Sidebar from "@/components/Sidebar";
+import SharedLayout from "@/components/layout/SharedLayout";
 
 type TrainingLog = {
     _id: string;
@@ -48,82 +49,80 @@ export default function AllTrainingLogs() {
             new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
+    const [search, setSearch] = useState("");
+
+    const filteredLogs = sortedLogs.filter((log) => log.title.toLowerCase().includes(search.toLowerCase()))
+
+
     return (
-        <div className="flex min-h-screen bg-gray-100">
-            <Sidebar />
+        <SharedLayout pageTitle="All training" onSearchChange={setSearch}>
+            <p className="mb-8 text-gray-500">
+                View all animal training records.
+            </p>
 
-            <main className="min-w-0 flex-1 p-8">
-                <h1 className="mb-2 text-3xl font-bold text-gray-900">
-                    All Training Logs
-                </h1>
+            {loading && <p>Loading training logs...</p>}
 
-                <p className="mb-8 text-gray-500">
-                    View all animal training records.
+            {error && (
+                <p role="alert" className="text-red-600">
+                    {error}
                 </p>
+            )}
 
-                {loading && <p>Loading training logs...</p>}
+            {!loading && !error && filteredLogs.length === 0 && (
+                <p>No training logs found.</p>
+            )}
 
-                {error && (
-                    <p role="alert" className="text-red-600">
-                        {error}
-                    </p>
-                )}
+            <div className="grid gap-5">
+                {filteredLogs.map((log) => {
+                    const userName =
+                        typeof log.user === "string"
+                            ? log.user
+                            : log.user?.fullName ?? "Unknown user";
+                    const animalName =
+                        typeof log.animal === "string"
+                            ? log.animal
+                            : log.animal?.name ?? "Unknown animal";
+                    const breed =
+                        typeof log.animal === "string"
+                            ? "Unknown"
+                            : log.animal?.breed ?? "Unknown";
 
-                {!loading && !error && sortedLogs.length === 0 && (
-                    <p>No training logs found.</p>
-                )}
+                    return (
+                        <div
+                            key={log._id}
+                            className="rounded-xl bg-white p-6 shadow-sm"
+                        >
+                            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                                <h2 className="text-xl font-bold text-gray-900">
+                                    {log.title}
+                                </h2>
 
-                <div className="grid gap-5">
-                    {sortedLogs.map((log) => {
-                        const userName =
-                            typeof log.user === "string"
-                                ? log.user
-                                : log.user?.fullName ?? "Unknown user";
-                        const animalName =
-                            typeof log.animal === "string"
-                                ? log.animal
-                                : log.animal?.name ?? "Unknown animal";
-                        const breed =
-                            typeof log.animal === "string"
-                                ? "Unknown"
-                                : log.animal?.breed ?? "Unknown";
-
-                        return (
-                            <div
-                                key={log._id}
-                                className="rounded-xl bg-white p-6 shadow-sm"
-                            >
-                                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                                    <h2 className="text-xl font-bold text-gray-900">
-                                        {log.title}
-                                    </h2>
-
-                                    <span className="text-sm text-gray-500">
-                                        {new Date(log.date).toLocaleDateString()}
-                                    </span>
-                                </div>
-
-                                <div className="mb-4 grid gap-2 text-sm text-gray-600 sm:grid-cols-2">
-                                    <p>
-                                        <strong>User:</strong> {userName}
-                                    </p>
-                                    <p>
-                                        <strong>Animal:</strong> {animalName}
-                                    </p>
-                                    <p>
-                                        <strong>Breed:</strong> {breed}
-                                    </p>
-                                    <p>
-                                        <strong>Hours:</strong> {log.hours}
-                                    </p>
-                                </div>
-
-                                <p className="text-gray-700">{log.description}</p>
+                                <span className="text-sm text-gray-500">
+                                            {new Date(log.date).toLocaleDateString()}
+                                        </span>
                             </div>
-                        );
-                    })}
-                </div>
-            </main>
-        </div>
+
+                            <div className="mb-4 grid gap-2 text-sm text-gray-600 sm:grid-cols-2">
+                                <p>
+                                    <strong>User:</strong> {userName}
+                                </p>
+                                <p>
+                                    <strong>Animal:</strong> {animalName}
+                                </p>
+                                <p>
+                                    <strong>Breed:</strong> {breed}
+                                </p>
+                                <p>
+                                    <strong>Hours:</strong> {log.hours}
+                                </p>
+                            </div>
+
+                            <p className="text-gray-700">{log.description}</p>
+                        </div>
+                    );
+                })}
+            </div>
+
+        </SharedLayout>
     );
 }
