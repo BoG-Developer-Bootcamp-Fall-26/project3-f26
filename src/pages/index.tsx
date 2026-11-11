@@ -16,7 +16,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/user/verify", {
+      const response = await fetch("/api/verify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -24,16 +24,16 @@ export default function Home() {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
         throw new Error("Invalid email or password.");
       }
 
-      const user = await response.json();
+      sessionStorage.setItem("userId", data.user.id);
+      sessionStorage.setItem("isAdmin", String(data.user.isAdmin));
 
-      sessionStorage.setItem("userId", user.id);
-      sessionStorage.setItem("isAdmin", String(user.isAdmin));
-
-      await router.push("/training");
+      await router.push("/admin/training");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Login failed."
@@ -96,7 +96,7 @@ export default function Home() {
             </p>
           )}
 
-          <button type="submit" disabled={loading} className="w-full rounded-lg bg-blue-600 py-3 font semibold text-white hover:bg-blue-700 disabled:opacity-50">
+          <button type="submit" disabled={loading} className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
             {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
