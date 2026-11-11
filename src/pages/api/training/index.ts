@@ -17,7 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ error: "DB connection failed" });
     }
 
-    const { user, animal, title, date, description, hours } = req.body ?? {};
+    const { user, animal, title, date, description } = req.body ?? {};
+    const hours = parseFloat(req.body?.hours);
     const parsedDate = new Date(date);
     if (
         !mongoose.isObjectIdOrHexString(user) || 

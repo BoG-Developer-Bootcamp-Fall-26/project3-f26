@@ -22,7 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse 
     }
 
     if (req.method === "POST") {
-        const { name, breed, owner, hoursTrained, profilePicture } = req.body ?? {};
+        const { name, breed, owner, profilePicture } = req.body ?? {};
+        const hoursTrained = parseFloat(req.body?.hoursTrained);
         if (
             !name ||
             !breed ||
@@ -45,7 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse 
             return res.status(500).json({ error: "Failed to create animal" });
         }
     } else {
-        const { animal, hours } = req.body ?? {};
+        const { animal } = req.body ?? {};
+        const hours = parseFloat(req.body?.hours);
         if (!mongoose.isObjectIdOrHexString(animal) || !Number.isFinite(hours)) {
             return res.status(400).json({ error: "Missing or invalid fields" });
         }

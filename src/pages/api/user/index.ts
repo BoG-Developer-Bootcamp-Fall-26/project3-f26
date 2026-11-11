@@ -21,12 +21,15 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
         return res.status(500).json({ error: "DB connection failed" });
     }
 
-    const {fullName, email, password, admin } = req.body;
-    if (!req.body || !fullName || !email || !password || typeof admin !== "boolean") {
+    const {fullName, email, password, admin } = req.body ?? {};
+    if (!fullName || !email || !password || typeof admin !== "boolean") {
         return res.status(400).json({ error: "Missing or invalid fields" });
     }
 
     try {
+        if (await User.exists({ email })) {
+            return res.status(400).json({error: "User with this email already exists" });
+        }
         const hash = await argon2.hash(password);
         const user = await User.create({ fullName, email, password: hash, admin });
         return res.status(200).json({ id: user._id });
