@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!user || !(await argon2.verify(user.password, password))) {
             return res.status(500).json({ error: "User does not exist" });
         }
-        return res.status(200).json({ id: user._id, admin: user.admin });
+        return res.status(200).json({ id: user._id, admin: user.admin, fullName: user.fullName });
     } catch {
         return res.status(500).json({ error: "User does not exist" });
     }

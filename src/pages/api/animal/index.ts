@@ -10,8 +10,8 @@ Create a PATCH endpoint at /api/animal to update the hoursTrained of an animal w
 
 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse ) {
-    if (req.method !== "POST" && req.method !== "PATCH") {
-        res.setHeader("Allow", ["POST", "PATCH"]);
+    if (req.method !== "GET" && req.method !== "POST" && req.method !== "PATCH") {
+        res.setHeader("Allow", ["GET", "POST", "PATCH"]);
         return res.status(500).json({ error: `Method ${req.method} not supported` });
     }
 
@@ -19,6 +19,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse 
         await connectDB();
     } catch {
         return res.status(500).json({ error: "DB connection failed" });
+    }
+
+    if (req.method === "GET") {
+        const { owner } = req.query;
+        if (!mongoose.isObjectIdOrHexString(owner)) {
+            return res.status(400).json({ error: "Missing or invalid owner" });
+        }
+        try { 
+            const animals = await Animal.find({ owner }).populate("owner", "fullName");
+            return res.status(200).json(animals)
+        } catch {
+            return res.status(500).json({ error: "Failed to fetch animals" });
+        }
     }
 
     if (req.method === "POST") {

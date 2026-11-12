@@ -32,7 +32,7 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
         }
         const hash = await argon2.hash(password);
         const user = await User.create({ fullName, email, password: hash, admin });
-        return res.status(200).json({ id: user._id });
+        return res.status(200).json({ id: user._id, fullName: user.fullName, admin: user.admin });
     } catch {
         return res.status(500).json({ error: "Failed to create new user" });
     }

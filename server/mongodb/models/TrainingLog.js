@@ -16,10 +16,12 @@ TrainingLog {
 const trainingLogSchema = new Schema ({
     user: {
         type: Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
     animal: {
         type: Schema.Types.ObjectId,
+        ref: "Animal",
         required: true,
     },
     title: {

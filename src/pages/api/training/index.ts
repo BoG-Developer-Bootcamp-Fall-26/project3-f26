@@ -6,8 +6,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import mongoose from "mongoose";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== "POST") {
-        res.setHeader("Allow", ["POST"]);
+    if (req.method !== "GET" && req.method !== "POST") {
+        res.setHeader("Allow", ["GET", "POST"]);
         return res.status(500).json({ error: `Method ${req.method} not supported` });
     }
 
@@ -15,6 +15,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await connectDB();
     } catch {
         return res.status(500).json({ error: "DB connection failed" });
+    }
+
+    if (req.method === "GET") {
+        const { user } = req.query;
+        if (!mongoose.isObjectIdOrHexString(user)) {
+            return res.status(400).json({ error: "Missing or invalid user" });
+        }
+        try {
+            const logs = await TrainingLog.find({ user })
+                .populate("user", "fullName")
+                .populate("animal", "name breed")
+                .sort({ date: -1 });
+            return res.status(200).json(logs);
+        } catch {
+            return res.status(500).json({ error: "Failed to fetch training logs"});
+        }
     }
 
     const { user, animal, title, date, description } = req.body ?? {};
