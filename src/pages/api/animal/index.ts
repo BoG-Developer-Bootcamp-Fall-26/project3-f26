@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse 
             !mongoose.isObjectIdOrHexString(owner) ||
             !Number.isFinite(hoursTrained) ||
             hoursTrained < 0 ||
-            !profilePicture //ok i lowk dk how to check if profile pic is a valid url. google later
+            !isValidURL(profilePicture) // check if profile pic is a valid url.
         ) {
             return res.status(400).json({ error: "Missing or invalid fields" });
         }
@@ -65,5 +65,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse 
         } catch {
             return res.status(500).json({ error: "Failed to update animal" });
         }
+    }
+}
+
+// a funciton that checks if the URL is in a valid format
+function isValidURL(url: unknown) {
+    if (typeof url !== "string") return false;
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
     }
 }
