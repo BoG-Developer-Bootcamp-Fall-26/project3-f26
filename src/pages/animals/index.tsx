@@ -24,6 +24,22 @@ export default function AnimalsPage() {
             .catch(() => setError("Could not load animals"));
     }, [user]);
 
+    async function handleDelete(id: string) {
+        const password = prompt("Enter your password to delete this animal and all of its training logs");
+        if (!password) return;
+        const res = await fetch("/api/animal", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            setError(data.error);
+            return;
+        }
+        setAnimals(animals.filter((animal) => animal._id !== id));
+    }
+
     return (
         <DashboardLayout>
             <PageHeader title="Animals" createLink="/animals/new" />
@@ -32,7 +48,7 @@ export default function AnimalsPage() {
                 {animals.length === 0 && <p className="text-gray-500">No animals to show.</p>}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                     {animals.map((animal) => (
-                        <AnimalCard key={animal._id} animal={animal} />
+                        <AnimalCard key={animal._id} animal={animal} onDelete={() => handleDelete(animal._id)} />
                     ))}
                 </div>
             </div>

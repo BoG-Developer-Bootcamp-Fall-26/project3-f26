@@ -34,6 +34,21 @@ export default function Sidebar() {
         logout();
         router.push("/");
     }
+    async function handleDeleteAccount() {
+        if (!user) return;
+        const password = prompt("Enter your password to delete your account. This also deletes your animals and logs.");
+        if (!password) return;
+        const res = await fetch("/api/user", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: user.id, password }),
+        });
+        if (res.ok) {
+            handleLogout();
+        } else {
+            alert("Could not delete account. Check your password.");
+        }
+    }
     function renderLink(item: NavItem) {
         const isActive = router.pathname === item.href || router.pathname.startsWith(item.href + "/");
         return (
@@ -71,6 +86,9 @@ export default function Sidebar() {
                     <Image src={logoutLogo} alt="Log out" className="h-6 w-6" />
                 </button>
             </div>
+            <button onClick={handleDeleteAccount} className="mt-2 px-2 text-left text-sm text-gray-400 hover:text-brand">
+                Delete account
+            </button>
         </nav>
     );
 }

@@ -24,6 +24,22 @@ export default function TrainingLogsPage() {
             .catch(() => setError("Could not load training logs"));
     }, [user]);
 
+    async function handleDelete(id: string) {
+        const password = prompt("Enter your password to delete this training log");
+        if (!password) return;
+        const res = await fetch("/api/training", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            setError(data.error);
+            return;
+        }
+        setLogs(logs.filter((log) => log._id !== id));
+    }
+
     return (
         <DashboardLayout>
             <PageHeader title="Training logs" createLink="/training-logs/new" />
@@ -31,7 +47,12 @@ export default function TrainingLogsPage() {
                 {error && <p className="text-red-600">{error}</p>}
                 {logs.length === 0 && <p className="text-gray-500">No training logs to show.</p>}
                 {logs.map((log) => (
-                    <TrainingLogCard key={log._id} log={log} />
+                    <TrainingLogCard
+                        key={log._id}
+                        log={log}
+                        editLink={`/training-logs/${log._id}/edit`}
+                        onDelete={() => handleDelete(log._id)}
+                    />
                 ))}
             </div>
         </DashboardLayout>
