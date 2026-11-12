@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import argon2 from "argon2";
 import clientPromise from "@/lib/mongodb";
+import {
+    COOKIE_NAME,
+    createSessionToken,
+} from "@/server/session"
 
 export default async function handler(
     req: NextApiRequest,
@@ -26,6 +30,9 @@ export default async function handler(
             email: email.trim().toLowerCase()
         })
 
+        console.log("User found:", !!user);
+        console.log("Has password hash:", typeof user?.password === "string");
+
         if (!user || typeof user.password !== "string") {
             return res.status(401).json({
                 error: "Invalid email or password"
@@ -36,12 +43,21 @@ export default async function handler(
             user.password,
             password
         )
+        console.log("Password valid:", validPassword);
 
         if (!validPassword) {
             return res.status(401).json({
                 error: "Invali email or password",
             })
         }
+
+        const token = await createSessionToken(
+            user._id.toString()
+        );
+
+        const cookie = [`${COOKIE_NAME} = ${encodeURIComponent(token)}`, "HttpOnly", "Path=/", "SameSite=Lax", "Max-Age=86400", ...(process.env.NODE_ENV === "production" ? ["Secure"] : []),].join("; ")
+
+        res.setHeader("Set-Cookie", cookie);
 
         return res.status(200).json({
             message: "Login successful",

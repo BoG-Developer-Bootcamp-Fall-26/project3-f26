@@ -15,5 +15,5 @@ export function getDatabase(): Db {
     client = new MongoClient(databaseUrl);
   }
 
-  return client.db();
+  return client.db("animalTraining");
 }
