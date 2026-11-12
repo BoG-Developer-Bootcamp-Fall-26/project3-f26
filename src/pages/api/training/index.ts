@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 import * as argon2 from "argon2";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== "GET" && req.method !== "POST" && req.method !== "DELETE") {
-        res.setHeader("Allow", ["GET", "POST", "DELETE"]);
+    if (req.method !== "GET" && req.method !== "POST" && req.method !== "PATCH" && req.method !== "DELETE") {
+        res.setHeader("Allow", ["GET", "POST", "PATCH", "DELETE"]);
         return res.status(500).json({ error: `Method ${req.method} not supported` });
     }
 
@@ -19,7 +19,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === "GET") {
-        const { user } = req.query;
+        const { user, id } = req.query;
+        if(id) {
+            if (!mongoose.isObjectIdOrHexString(id)) {
+                return res.status(400).json({ error: "Invalid id" });
+            }
+            try {
+                const log = await TrainingLog.findById(id).populate("user", "fullName").populate("animal", "name breed");
+                if (!log) {
+                    return res.status(400).json({ error: "Training log does not exist" });
+                }
+                return res.status(200).json(log);
+            } catch {
+                return res.status(500).json({ error: "Failed to fetch training log" });
+            }
+        }
         if (!mongoose.isObjectIdOrHexString(user)) {
             return res.status(400).json({ error: "Missing or invalid user" });
         }
@@ -33,6 +47,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(500).json({ error: "Failed to fetch training logs"});
         }
     }
+
+    if (req.method === "PATCH") {
+        const { id, user, animal, title, description } = req.body ?? {};
+        const hours = parseFloat(req.body?.hours);
+        if (
+            !mongoose.isObjectIdOrHexString(id) ||
+            !mongoose.isObjectIdOrHexString(user) ||
+            !mongoose.isObjectIdOrHexString(animal) ||
+            !title ||
+            !description ||
+            !Number.isFinite(hours) ||
+            hours < 0
+        ) {
+            return res.status(400).json({ error: "Missing or invalid fields" });
+        }
+        try {
+            const log = await TrainingLog.findById(id);
+            if (!log) {
+                return res.status(400).json({ error: "Training log does not exist" });
+            }
+            if (String(log.user) !== user) {
+                return res.status(400).json({ error: "Training log does not belong to user" });
+            }
+            const owned = await Animal.exists({ _id: animal, owner: user });
+            if (!owned) {
+                return res.status(400).json({ error: "Animal does not exist or belong to user" });
+            }
+
+            log.animal = animal;
+            log.title = title;
+            log.description = description;
+            log.hours = hours;
+            await log.save();
+            return res.status(200).json({ id: log._id });
+        } catch {
+            return res.status(500).json({ error: "Failed to update training log" });
+        }
+    }
+
     /* Incorporate a way to delete users, animals,
        and training logs (which would cause animal hoursTrained to be decremented)
        and follow similar response formats as before for error handling.
